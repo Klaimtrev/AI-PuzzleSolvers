@@ -87,15 +87,18 @@ public abstract class Solver {
      */
     public void solve() {   
         Vertex current = new Vertex(problem.getCurrentState());
-        Date before = new Date();
+        //Date before = new Date();
+        long before = System.nanoTime();
         Vertex goal = search(current);
-        Date after = new Date();
+        //Date after = new Date();
+        long after = System.nanoTime();
         if (goal == null) {
             throw new RuntimeException("Solution not found");
         }
         solution = new Solution(current, goal);
         statistics.putStat(LENGTH, solution.getLength());
-        statistics.putStat(TIME, (int)(after.getTime() - before.getTime()));
+        //statistics.putStat(TIME, (int)(after.getTime() - before.getTime()));
+        statistics.putStat(TIME, ((after - before) / 1_000_000.0));
     }
 
     /**

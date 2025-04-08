@@ -28,13 +28,12 @@ public class StateSpaceSolver extends Solver {
         super(problem);
         deque = new LinkedList<>();
         setQueue(deque);
-        s = new Statistics();
         BFS= bfs;
         copy = problem;
         if (bfs){
-        s.setHeader(problem.getName()+"\n"+"Breadth-First State Space Search");
+        getStatistics().setHeader(problem.getName()+"\n"+"Breadth-First State Space Search");
         }
-        else{s.setHeader(problem.getName()+"\n"+"Depth-First State Space Search");}
+        else{getStatistics().setHeader(problem.getName()+"\n"+"Depth-First State Space Search");}
         moveNames = problem.getMover().getMoveNames();
         }
     
@@ -109,7 +108,7 @@ public class StateSpaceSolver extends Solver {
         return false;
     }
     private final boolean BFS;
-    Statistics s;
+    public Statistics s;
     Problem copy;
     private Deque<Vertex> deque;
     private final List<String> moveNames;

@@ -25,6 +25,7 @@ public class AStarSolver extends StateSpaceSolver {
         super(problem, false);
         //Comparator<Vertex> comparator = null;
         comparator = getComparator();
+        getStatistics().setHeader(problem.getName()+"\n"+"A* Search");
         PriorityQueue<Vertex> queue = new PriorityQueue<Vertex>(10, comparator);
         setQueue(queue);
     }

@@ -66,14 +66,10 @@ public class ProblemGUI extends VBox {
         Vertical2= new VBox();
         /*SOLVING*/
         solving = new HBox();
-//        graphcreator= new GraphCreator();
-//        graph= new Graph();
-//        graph =graphcreator.createGraphFor(problem);
-//        graphSearcher = new GraphSearcher(graph);
+
         BFS = new StateSpaceSolver(problem, true);
         DFS = new StateSpaceSolver(problem,true);
         
-        //createReset(solving);
         solvingCreateButtons();
         message = new Text(10, 50, "You solved the problem.\nCongratulations!");
         message.setFont(Font.font("Calisto MT",25));
@@ -99,7 +95,6 @@ public class ProblemGUI extends VBox {
         CreateButtons(moveNames,root);
         Vertical1.getChildren().addAll(currentState,state);
         Vertical2.getChildren().addAll(goalState,goal);
-        //root.getChildren().add(button);
         root2.getChildren().addAll(Vertical1,root,Vertical2);
         root2.setAlignment(Pos.CENTER);
         super.getChildren().addAll(welcomeMessage,
@@ -133,14 +128,12 @@ public class ProblemGUI extends VBox {
                 super.getChildren().clear();
                 super.getChildren().addAll(welcomeMessage,
 				   introduction,root2,solving);
-                //root.getChildren().add(CreateReset(root));
                 if (solver.isProblemSolved()) {
                 root.getChildren().add(message);
                         }
             });
             button.setAlignment(Pos.CENTER);
             v.getChildren().add(button);
-            //CreateReset(root);
         }
     }
     /**
@@ -151,50 +144,56 @@ public class ProblemGUI extends VBox {
      * @return the button to reset the problem
      */
     private Button createReset(){
-        button = new Button("RESET");
-        button.setOnAction((event) -> {
-            solver.reset();
-            state = new Label((solver.getProblem().getCurrentState().toString()));
-            Moves = new Label("Moves: "+ solver.getMoveCount());
-            setFont(Moves);
-            StateLook(state);  
-            Vertical1.getChildren().clear();
-            Vertical1.getChildren().addAll(currentState,state);
-            Vertical2.getChildren().clear();
-            Vertical2.getChildren().addAll(goalState,goal);
-            root.getChildren().clear();
-            CreateButtons(moveNames,root);
-            //root.getChildren().add(createReset());
-            solving.getChildren().clear();
-            solvingCreateButtons();
-            //super.getChildren().add(solving);
-            
-            root2.getChildren().clear();
-            root2.getChildren().addAll(Vertical1,root,Vertical2);
-            super.getChildren().clear();
-            super.getChildren().addAll(welcomeMessage,
-				   introduction,root2);
-        });
-        return button;
-    }
+    button = new Button("RESET");
+    button.setOnAction((event) -> {
+        solver.reset();
+        state = new Label((solver.getProblem().getCurrentState().toString()));
+        Moves = new Label("Moves: "+ solver.getMoveCount());
+        setFont(Moves);
+        StateLook(state);  
+        Vertical1.getChildren().clear();
+        Vertical1.getChildren().addAll(currentState,state);
+        Vertical2.getChildren().clear();
+        Vertical2.getChildren().addAll(goalState,goal);
+        root.getChildren().clear();
+        CreateButtons(moveNames,root);
+        solving.getChildren().clear();
+        solvingCreateButtons();
+        root2.getChildren().clear();
+        root2.getChildren().addAll(Vertical1,root,Vertical2);
+        super.getChildren().clear();
+        super.getChildren().addAll(welcomeMessage, introduction, root2, solving);
+    });
+    return button;
+}
     private void solvingCreateButtons() {
         VBox Vertical1 = new VBox();
         VBox Vertical2 = new VBox();
         VBox Vertical3 = new VBox();
         VBox Vertical4 = new VBox();
+        
+        Vertical1.setAlignment(Pos.CENTER);
+        Vertical2.setAlignment(Pos.CENTER);
+        Vertical3.setAlignment(Pos.CENTER);
+        Vertical4.setAlignment(Pos.CENTER);
+        
+        Vertical1.setSpacing(10);
+        Vertical2.setSpacing(10);
+        Vertical3.setSpacing(10);
+
 
         solve = new Button("SOLVE");
         next = new Button("NEXT");
-        Button aiSolve = new Button("AI SOLVE");
-
-        //next.disableProperty().bind(Bindings.not(solve.disableProperty()));
+        aiSolve = new Button("A* SOLVE");
 
         scroll = new ChoiceBox<>();
         scroll.getItems().addAll("Breadth-First Search", "Depth-First Search");
 
         Text Search_Type = new Text("Search Type"); 
         Text Benchmarks = new Text("Benchmarks");
-        Text Statistics = new Text("Statistics");
+        Text statisticsLabel = new Text("Statistics");
+        Label statisticsContent = new Label();
+        statisticsContent.setWrapText(true);
 
         solve.setOnAction(event -> {
             System.out.println("Solve button clicked!");
@@ -207,14 +206,16 @@ public class ProblemGUI extends VBox {
             // Get the selected search type
             String selectedSearch = (String) scroll.getValue();
             
-            System.out.println("The selected SEARCH is: "+selectedSearch);
+            //System.out.println("The selected SEARCH is: "+selectedSearch);
 
 
             // Determine whether BFS (true) or DFS (false)
             boolean bfs = "Breadth-First Search".equals(selectedSearch);
 
-            StateSpaceSolver solver = new StateSpaceSolver(problem, bfs); 
+            StateSpaceSolver solver = new StateSpaceSolver(problem, bfs);
             solver.solve();
+            System.out.println(solver.getStatistics().toString());
+            statisticsContent.setText(solver.getStatistics().toString());
             solution = solver.getSolution();
             
             //AStarSolver Asolver = new AStarSolver(problem); 
@@ -225,7 +226,6 @@ public class ProblemGUI extends VBox {
                 System.out.println("No solution found.");
             } else {
                 System.out.println("Solution found:");
-                System.out.print("Total moves: "+ solution.getLength());
             }
         });
 
@@ -257,19 +257,22 @@ public class ProblemGUI extends VBox {
 
 
         aiSolve.setOnAction(event -> {
-            AStarSolver solver = new AStarSolver(problem); 
+            AStarSolver solver = new AStarSolver(problem);
             solver.solve();
+            System.out.println(solver.getStatistics().toString());
+            statisticsContent.setText(solver.getStatistics().toString());
             solution = solver.getSolution();
-
-            System.out.println("AI Solver Solution: " + solution);
         });
 
         Vertical1.getChildren().addAll(solve, next, aiSolve, createReset());
         Vertical2.getChildren().addAll(Search_Type, scroll);
-        Vertical3.getChildren().addAll(Statistics);
+        Vertical3.getChildren().addAll(statisticsLabel, statisticsContent);
         Vertical4.getChildren().addAll(Benchmarks);
 
         solving.getChildren().addAll(Vertical1, Vertical2, Vertical3);
+        solving.setAlignment(Pos.CENTER);
+        solving.setSpacing(30);
+        solving.setPadding(new Insets(10, 0, 10, 0));
     }
 
     /**
@@ -320,6 +323,7 @@ public class ProblemGUI extends VBox {
     private Button solve;
     private Button next;
     private Button reset;
+    private Button aiSolve;
     private ChoiceBox scroll;
     private ChoiceBox benchmark;
 //    private final GraphSearcher graphSearcher;

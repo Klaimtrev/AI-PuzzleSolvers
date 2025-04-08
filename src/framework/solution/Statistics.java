@@ -53,7 +53,7 @@ public class Statistics {
      * @param key the name of the statistic
      * @param v the statistic's value
      */
-    public void putStat(String key, Integer v) {
+    public void putStat(String key, Number v) {
         statMap.put(key, v);
     }
     
@@ -71,6 +71,14 @@ public class Statistics {
         return (Integer)o;
     }
     
+    public double getStatAsDouble(String key) {
+        Number num = statMap.get(key);
+        if (num == null) {
+            throw new RuntimeException("Key not found in getStatAsDouble: " + key);
+        }
+        return num.doubleValue();
+    }
+
     /**
      * Sets all of the statistics to zero.
      */
@@ -91,13 +99,20 @@ public class Statistics {
         builder.append(header);
         builder.append("\n");
         keyList.stream().forEach(k -> { 
-            builder.append(k + "   " + statMap.get(k) + "\n");
+            Number val = statMap.get(k);
+            if (val instanceof Double) {
+                builder.append(k + "   " + String.format("%.3f ms", val.doubleValue()) + "\n");
+            } else {
+                builder.append(k + "   " + val + "\n");
+            }
         });
         return builder.toString();
     }
     
     private final List<String> keyList;
-    private final HashMap<String, Integer> statMap;
+    private final HashMap<String, Number> statMap;
     
     private String header;
+    
+    private long startTime;
 }
